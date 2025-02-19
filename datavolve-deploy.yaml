@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: datavolve-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: datavolve-container
+        image: acrdatavolvedemo2.azurecr.io/bccsoftware/datavolve:latest
+        command: ["/bin/bash", "-c"]
+        args: ["ls -R /datavolve-volume"]
+        volumeMounts:
+        - name: datavolve-volume
+          mountPath: /datavolve-volume
+          readOnly: true
+      restartPolicy: Never
+      volumes:
+      - name: datavolve-volume
+        csi:
+          driver: file.csi.azure.com
+          readOnly: false
+          volumeAttributes:
+            shareName: datavolve-container
+            useManagedIdentity: "true"
+            managedIdentityClientID: "261ac719-91e0-438d-aebc-7e5687c074fb"
+  backoffLimit: 4
