@@ -28,13 +28,15 @@ export AZURE_STORAGE_CONNECTION_STRING=$(az storage account show-connection-stri
 az storage share create -n datavolve-container --connection-string $AZURE_STORAGE_CONNECTION_STRING
 
 # Get the system Assigned Identity Client ID
-export AKS_MANAGED_IDENITYT=$(az aks show --name myAKSCluster0472af --resource-group myAKSResourceGroup0472af --query "identityProfile.kubeletidentity.clientId" -o tsv)
+export AKS_MANAGED_IDENITY_SPN_ID=$(az aks show --name myAKSCluster0472af --resource-group myAKSResourceGroup0472af --query "identityProfile.kubeletidentity.clientId" -o tsv)
+
+export AKS_MANAGED_IDENITY_SPN_OBJ_ID=$(az ad sp show --id $AKS_MANAGED_IDENITY_SPN_ID --query "id" -o tsv)
 
 # [IMPORTANT] Assign the client ID to inside the azure-storage-csi.yaml and azurefiles-pv.yaml files
 
 # [IMPORTANT] USE THE PORTAL TO DO THIS FOR NOW: In the storage account Add the system assigned identity as the Storage file Data Contrubutor
 # add this one liner to the script to automate this
-az role assignment create --assignee $AKS_MANAGED_IDENITYT --role "Storage Blob Data Contributor" --scope /subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroup>/providers/Microsoft.Storage/storageAccounts/<StorageAccountName>
+az role assignment create --assignee-object-id $AKS_MANAGED_IDENITY_SPN_OBJ_ID --assignee-principal-type ServicePrincipal --role "Storage Blob Data Contributor" --scope /subscriptions/28d10200-70b0-476c-b004-c6ae29265897/resourceGroups/MC_myAKSResourceGroup0472af_myAKSCluster0472af_canadacentral/providers/Microsoft.Storage/storageAccounts/sadatavolveaccount
 
 # Create the persistant Volume
 kubectl create -f azure-storage-csi.yaml
