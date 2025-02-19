@@ -13,15 +13,10 @@ spec:
         volumeMounts:
         - name: datavolve-volume
           mountPath: /datavolve-volume
-          readOnly: true
+          readOnly: false
       restartPolicy: Never
       volumes:
       - name: datavolve-volume
-        csi:
-          driver: file.csi.azure.com
-          readOnly: false
-          volumeAttributes:
-            shareName: datavolve-container
-            useManagedIdentity: "true"
-            managedIdentityClientID: "261ac719-91e0-438d-aebc-7e5687c074fb"
+        persistentVolumeClaim:
+          claimName: azurefile
   backoffLimit: 4
