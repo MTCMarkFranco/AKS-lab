@@ -12,11 +12,11 @@ spec:
         args: ["ls -R /datavolve-volume"]
         volumeMounts:
         - name: datavolve-volume
-          mountPath: /datavolve-volume
+          mountPath: /mnt/datavolve-volume
           readOnly: false
       restartPolicy: Never
       volumes:
       - name: datavolve-volume
         persistentVolumeClaim:
-          claimName: azurefile
+          claimName: datavolve-volume-claim
   backoffLimit: 4

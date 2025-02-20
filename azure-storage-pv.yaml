@@ -3,24 +3,21 @@ kind: PersistentVolume
 metadata:
   annotations:
     pv.kubernetes.io/provisioned-by: file.csi.azure.com
-  name: azurefile
+  name: datavolve-volume
 spec:
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: azurefile-csi
+  storageClassName: azurefile-csi-managed-identity
   csi:
     driver: file.csi.azure.com
     volumeHandle: "MC_myAKSResourceGroup0472af_myAKSCluster0472af_canadacentral#sadatavolveaccount#datavolve-container"  # make sure this volumeid is unique for every identical share in the cluster
     volumeAttributes:
       shareName: datavolve-container
       useManagedIdentity: "true"
-      managedIdentityClientID: "261ac719-91e0-438d-aebc-7e5687c074fb"
-    nodeStageSecretRef:
-      name: azure-secret
-      namespace: default
+      managedIdentityClientID: "0d938379-ce39-41a9-a44e-3b31acf0090e"
   mountOptions:
     - dir_mode=0777
     - file_mode=0777
