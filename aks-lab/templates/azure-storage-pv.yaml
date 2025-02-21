@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: workload-1-volume
+  labels:
+    usage: workload-1
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  csi:
+    driver: blob.csi.azure.com
+    volumeHandle: MC_{{ .Values.aksLab.resourceGroupName }}_{{ .Values.aksLab.clusterName }}_{{ .Values.aksLab.region }}#{{ .Values.aksLab.storageAccountName }}#{{ .Values.aksLab.containerName }}
+    volumeAttributes:
+      containerName: {{ .Values.aksLab.containerName }}
+      storageAccount: {{ .Values.aksLab.storageAccountName }}
+      azureStorageAuthType: MSI
+      azureStorageIdentityClientID: {{ .Values.aksLab.azureStorageIdentityClientID }}

@@ -1,7 +1,7 @@
 # Initialization
-export MY_RESOURCE_GROUP_NAME="AKS-Lab-ResourceGroup"
+export AKS_CLUSTER_RESOURCE_GROUP_NAME="AKS-Lab-ResourceGroup"
 export REGION="canadacentral"
-export MY_AKS_CLUSTER_NAME="AKSLabCluster"
+export AKS_CLUSTER_NAME="AKSLabCluster"
 export NODEPOOL_NAME="wrkld1pool"
 export WORKLOAD_STORAGE_ACCOUNT_NAME="saworkload1account"
 export WORKLOAD_CONTAINER_NAME="workload-1-container"
@@ -29,12 +29,18 @@ then
     echo "run: az aks install-cli"
     exit
 fi
+# check if helm is installed
+if ! command -v helm &> /dev/null
+then
+    echo "Helm could not be found. Please install it first."
+    exit
+fi
 
 # Display starting configurations
 echo "Starting Settings:"
-echo "Resource Group Name: $MY_RESOURCE_GROUP_NAME"
+echo "Resource Group Name: $AKS_CLUSTER_RESOURCE_GROUP_NAME"
 echo "Region: $REGION"
-echo "AKS Cluster Name: $MY_AKS_CLUSTER_NAME"
+echo "AKS Cluster Name: $AKS_CLUSTER_NAME"
 echo "Default Node Pool Name: $NODEPOOL_NAME"
 echo "Workload Storage Account Name: $WORKLOAD_STORAGE_ACCOUNT_NAME"
 echo "Workload Container Name: $WORKLOAD_CONTAINER_NAME"
@@ -47,10 +53,10 @@ echo "----------------------------------------"
 az login --use-device-code
 
 # Creation Commands
-echo "Creating AKS Cluster: $MY_AKS_CLUSTER_NAME"
-az group create --name $MY_RESOURCE_GROUP_NAME --location $REGION
-az aks create --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_AKS_CLUSTER_NAME --node-count 1 --generate-ssh-keys --nodepool-name $NODEPOOL_NAME
-echo "AKS Cluster: $MY_AKS_CLUSTER_NAME created successfully."
+echo "Creating AKS Cluster: $AKS_CLUSTER_NAME"
+az group create --name $AKS_CLUSTER_RESOURCE_GROUP_NAME --location $REGION
+az aks create --resource-group $AKS_CLUSTER_RESOURCE_GROUP_NAME --name $AKS_CLUSTER_NAME --node-count 1 --generate-ssh-keys --nodepool-name $NODEPOOL_NAME
+echo "AKS Cluster: $AKS_CLUSTER_NAME created successfully."
 
 # Pause and prompt user to continue
 read -p "Configuration begins...Press 'y' to continue: " -n 1 -r
@@ -62,24 +68,24 @@ then
 fi
 
 # Enabled User Assigned Managed Identity on the Nodepools
-echo "Enabling User Assigned Managed Identity on the Nodepools for Cluster: $MY_AKS_CLUSTER_NAME"
-az aks update --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_AKS_CLUSTER_NAME --enable-managed-identity
+echo "Enabling User Assigned Managed Identity on the Nodepools for Cluster: $AKS_CLUSTER_NAME"
+az aks update --resource-group $AKS_CLUSTER_RESOURCE_GROUP_NAME --name $AKS_CLUSTER_NAME --enable-managed-identity
 # recycle nodes to accept system Managed identity security scheme
-echo "Recycling the Nodepools for Cluster: $MY_AKS_CLUSTER_NAME"
-az aks nodepool upgrade --resource-group $MY_RESOURCE_GROUP_NAME --cluster-name $MY_AKS_CLUSTER_NAME --name $NODEPOOL_NAME --node-image-only
+echo "Recycling the Nodepools for Cluster: $AKS_CLUSTER_NAME"
+az aks nodepool upgrade --resource-group $AKS_CLUSTER_RESOURCE_GROUP_NAME --cluster-name $AKS_CLUSTER_NAME --name $NODEPOOL_NAME --node-image-only
 
 # Add the Blob CSI Driver
-echo "Adding Blob CSI Drivers to the cluster: $MY_AKS_CLUSTER_NAME"
-az aks update --enable-blob-driver --name $MY_AKS_CLUSTER_NAME --resource-group $MY_RESOURCE_GROUP_NAME
+echo "Adding Blob CSI Drivers to the cluster: $AKS_CLUSTER_NAME"
+az aks update --enable-blob-driver --name $AKS_CLUSTER_NAME --resource-group $AKS_CLUSTER_RESOURCE_GROUP_NAME
 
 # Get the credentials to login to the cluster and SSH etc...
 echo "Getting Cluster Credentials..."
-az aks get-credentials --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_AKS_CLUSTER_NAME
+az aks get-credentials --resource-group $AKS_CLUSTER_RESOURCE_GROUP_NAME --name $AKS_CLUSTER_NAME
 
 echo "Getting MSI Client ID..."
-export KUBELET_USER_ASSIGNED_IDENTITY_CLIEND_ID=$(az aks show --name $MY_AKS_CLUSTER_NAME --resource-group $MY_RESOURCE_GROUP_NAME --query identityProfile.kubeletidentity.clientId --output tsv)
+export KUBELET_USER_ASSIGNED_IDENTITY_CLIEND_ID=$(az aks show --name $AKS_CLUSTER_NAME --resource-group $AKS_CLUSTER_RESOURCE_GROUP_NAME --query identityProfile.kubeletidentity.clientId --output tsv)
 echo "Getting NodePool Resource Group Name..."
-export NODEPOOL_RESOURCE_GROUP_NAME=$(az aks show --name $MY_AKS_CLUSTER_NAME --resource-group $MY_RESOURCE_GROUP_NAME --query nodeResourceGroup -o tsv)
+export NODEPOOL_RESOURCE_GROUP_NAME=$(az aks show --name $AKS_CLUSTER_NAME --resource-group $AKS_CLUSTER_RESOURCE_GROUP_NAME --query nodeResourceGroup -o tsv)
 
 # Create the storage account to mount the volume
 echo "Creating Storage Account: $WORKLOAD_STORAGE_ACCOUNT_NAME in Resource Group: $NODEPOOL_RESOURCE_GROUP_NAME"
@@ -102,20 +108,6 @@ echo "Creating ACR Role Assignment for ACR: $ACR_NAME"
 export ACR_ID=$(az acr show --name $ACR_NAME --resource-group $NODEPOOL_RESOURCE_GROUP_NAME --query id -o tsv)
 az role assignment create --assignee $KUBELET_USER_ASSIGNED_IDENTITY_CLIEND_ID --role "AcrPull" --scope $ACR_ID
 
-# Create the configmap for the storage account to store the MSI Client ID (For using in PV YAML)
-echo "Creating the PV File from template and replacing token with MSI Client ID: $KUBELET_USER_ASSIGNED_IDENTITY_CLIEND_ID"
-# replace the token in the azure-storage-pv-template.yaml with the MSI Client ID and output to the file: azure-storage-pv.yaml
-sed "s|{REPLACE_WITH_MSI_CLIENT_ID}|$KUBELET_USER_ASSIGNED_IDENTITY_CLIEND_ID|g" azure-storage-pv-template.yaml > azure-storage-pv.yaml
-
-
-# Create the persistant Volume
-echo "Creating Persistent Volume..."
-kubectl apply -f azure-storage-pv.yaml
-
-# Set Volume Properties and apply the volume
-echo "Creating Persistent Volume Claim..."
-kubectl apply -f azure-storage-pvc.yaml
-
 # Docker Commands to Build and Push the Image
 echo "Building and Pushing Docker Image..."
 docker build -t $DOCKER_IMAGE_NAME .
@@ -124,6 +116,15 @@ az acr login --name $ACR_NAME
 docker push $ACR_NAME.azurecr.io/$ACR_REPO_NAME/$DOCKER_IMAGE_NAME:latest --quiet
 wait
 
-# Apply the workload deployment
-echo "Creating Workload Deployment..."
-kubectl apply -f workload-1-deploy.yaml
+# Helm Commands to Install the Workload (Only Done Once - Already done for Repo)
+# helm create aks-lab
+# helm repo add stable https://charts.helm.sh/stable
+# helm repo update
+
+helm install aks-lab ./aks-lab \
+  --set aksLab.resourceGroupName=$AKS_CLUSTER_RESOURCE_GROUP_NAME \
+  --set aksLab.region=$REGION \
+  --set aksLab.clusterName=$AKS_CLUSTER_NAME \
+  --set aksLab.storageAccountName=$WORKLOAD_STORAGE_ACCOUNT_NAME \
+  --set aksLab.containerName=$WORKLOAD_CONTAINER_NAME \
+  --set aksLab.azureStorageIdentityClientID=$KUBELET_USER_ASSIGNED_IDENTITY_CLIEND_ID
