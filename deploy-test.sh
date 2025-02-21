@@ -32,6 +32,6 @@ helm template aks-lab ./aks-lab \
   --set aksLab.resourceGroupName=$AKS_CLUSTER_RESOURCE_GROUP_NAME \
   --set aksLab.region=$REGION \
   --set aksLab.clusterName=$AKS_CLUSTER_NAME \
-  --set aksLab.storageAccountName=$STORAGE_ACCOUNT_NAME \
+  --set aksLab.storageAccountName=$WORKLOAD_STORAGE_ACCOUNT_NAME \
   --set aksLab.containerName=$WORKLOAD_CONTAINER_NAME \
   --set aksLab.azureStorageIdentityClientID=$KUBELET_USER_ASSIGNED_IDENTITY_CLIEND_ID

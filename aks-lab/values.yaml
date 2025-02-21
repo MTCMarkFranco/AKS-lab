@@ -124,9 +124,9 @@ affinity: {}
 
 # Custom section for AKS Lab
 aksLab:
-  resourceGroupName: ""
-  region: ""
-  clusterName: ""
-  storageAccountName: ""
-  containerName: ""
-  azureStorageIdentityClientID: ""
+  resourceGroupName: "_"
+  region: "_"
+  clusterName: "_"
+  storageAccountName: "_"
+  containerName: "_"
+  azureStorageIdentityClientID: "_"

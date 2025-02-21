@@ -12,9 +12,9 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   csi:
     driver: blob.csi.azure.com
-    volumeHandle: MC_{{ .Values.resourceGroupName }}_{{ .Values.clusterName }}_{{ .Values.region }}#{{ .Values.storageAccountName }}#{{ .Values.containerName }}
+    volumeHandle: MC_{{ .Values.aksLab.resourceGroupName }}_{{ .Values.aksLab.clusterName }}_{{ .Values.aksLab.region }}#{{ .Values.aksLab.storageAccountName }}#{{ .Values.aksLab.containerName }}
     volumeAttributes:
-      containerName: {{ .Values.containerName }}
-      storageAccount: {{ .Values.storageAccountName }}
+      containerName: {{ .Values.aksLab.containerName }}
+      storageAccount: {{ .Values.aksLab.storageAccountName }}
       azureStorageAuthType: MSI
-      azureStorageIdentityClientID: {{ .Values.azureStorageIdentityClientID }}
+      azureStorageIdentityClientID: {{ .Values.aksLab.azureStorageIdentityClientID }}
