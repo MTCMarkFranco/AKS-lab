@@ -8,10 +8,11 @@ Before running the deployment script, ensure you have the following installed:
 - Azure CLI (`az`)
 - Docker
 - kubectl (can be installed via `az aks install-cli`)
+- Helm (can be installed via `curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash`)
 
 ## Deployment
 
-The `deploy.sh` script automates the deployment of the AKS cluster and all necessary resources. It performs the following steps:
+The `deploy-install.sh` script automates the deployment of the AKS cluster and all necessary resources. It performs the following steps:
 1. Creates an AKS cluster.
 2. Enables User Assigned Managed Identity on the Nodepools.
 3. Adds the Blob CSI Driver to the cluster.
@@ -23,9 +24,14 @@ The `deploy.sh` script automates the deployment of the AKS cluster and all neces
 9. Builds and pushes the Docker image to the ACR.
 10. Deploys the workload job to the AKS cluster.
 
-To deploy the cluster and resources, run:
+To deploy the cluster and resources, **run**:
 ```bash
-./deploy.sh
+./deploy-install.sh
+```
+
+To test the deployment (**Output helm generated YAML files ONLY**), run:
+```bash
+./deploy-test.sh
 ```
 
 ## Project Structure
@@ -34,7 +40,8 @@ To deploy the cluster and resources, run:
 - `Dockerfile`: Specifies the Docker image for the workload container.
 - `azure-storage-pvc.yaml`: Defines the Persistent Volume Claim.
 - `azure-storage-pv.yaml`: Defines the Persistent Volume.
-- `deploy.sh`: Shell script to deploy the AKS cluster and resources.
+- `deploy-install.sh`: Shell script to deploy the AKS cluster and resources.
+- `deploy-test.sh`: Shell script to test the deployment.
 
 ## Summary
 
