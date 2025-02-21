@@ -17,6 +17,6 @@ spec:
       containerName: workload-1-container
       storageAccount: saworkload1account
       azureStorageAuthType: MSI
-      azureStorageIdentityClientID: ${AZURE_STORAGE_IDENTITY_CLIENT_ID}
+      azureStorageIdentityClientID: {REPLACE_WITH_MSI_CLIENT_ID}
 
 

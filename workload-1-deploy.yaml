@@ -5,22 +5,15 @@ metadata:
 spec:
   template:
     spec:
-      serviceAccountName: uami-service-account
       containers:
       - name: workload-1-container
-        image: acr-workload-1.azurecr.io/workload1repo/workload-1:latest
+        image: acrakslabworkload1.azurecr.io/workload1repo/workload-1-image:latest
         command: ["/bin/bash", "-c"]
-        args: ["mkdir -p /mnt/workload-1-volume/RESULTS && ls -R /mnt/workload-1-volume > /mnt/workload-1-volume/RESULTS/workload-1-results.txt"]
+        args: ["ls -R /mnt/workload-1-volume > /mnt/workload-1-volume/RESULTS/workload-1-results.txt"]
         volumeMounts:
         - name: workload-1-volume
           mountPath: /mnt/workload-1-volume
           readOnly: false
-        env:
-        - name: AZURE_STORAGE_IDENTITY_CLIENT_ID
-          valueFrom:
-            configMapKeyRef:
-              name: azure-storage-config
-              key: azureStorageIdentityClientID
       restartPolicy: Never
       volumes:
       - name: workload-1-volume
