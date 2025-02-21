@@ -104,8 +104,9 @@ az role assignment create --assignee $KUBELET_USER_ASSIGNED_IDENTITY_CLIEND_ID -
 
 # Create the configmap for the storage account to store the MSI Client ID (For using in PV YAML)
 echo "Create configmap azure-storage-config for MSI Client ID Storage - MSI Client ID: $KUBELET_USER_ASSIGNED_IDENTITY_CLIEND_ID"
-# replace the toke in the  azure-storage-pv.yaml with the MSI Client ID
-sed -i "s/{REPLACE_WITH_MSI_CLIENT_ID}/$KUBELET_USER_ASSIGNED_IDENTITY_CLIEND_ID/g" azure-storage-pv.yaml
+# replace the token in the azure-storage-pv-template.yaml with the MSI Client ID and output to the file: azure-storage-pv.yaml
+sed "s|{REPLACE_WITH_MSI_CLIENT_ID}|$KUBELET_USER_ASSIGNED_IDENTITY_CLIEND_ID|g" azure-storage-pv-template.yaml > azure-storage-pv.yaml
+
 
 # Create the persistant Volume
 echo "Creating Persistent Volume..."
