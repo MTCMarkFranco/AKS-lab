@@ -1,8 +1,9 @@
 # Initialization
+export AZURE_SUBSCRIPTION="Contoso"
 export MY_RESOURCE_GROUP_NAME="AKS-Lab-ResourceGroup"
 export REGION="canadacentral"
 export MY_AKS_CLUSTER_NAME="AKSLabCluster"
-export NODEPOOL_NAME="workload-npl"
+export NODEPOOL_NAME="wrkld1pool"
 export WORKLOAD_STORAGE_ACCOUNT_NAME="saworkload1account"
 export WORKLOAD_CONTAINER_NAME="workload-1-container"
 export ACR_NAME="acr-workload-1"
@@ -42,6 +43,10 @@ echo "Azure Container Registry Name: $ACR_NAME"
 echo ACR Repo Name: $ACR_REPO_NAME
 echo "Docker Image Name: $DOCKER_IMAGE_NAME"
 echo "----------------------------------------"
+
+# Az Login
+az login --use-device-code
+az account set --subscription $AZURE_SUBSCRIPTION
 
 # Creation Commands
 echo "Creating AKS Cluster: $MY_AKS_CLUSTER_NAME"
