@@ -5,7 +5,7 @@ export MY_AKS_CLUSTER_NAME="AKSLabCluster"
 export NODEPOOL_NAME="wrkld1pool"
 export WORKLOAD_STORAGE_ACCOUNT_NAME="saworkload1account"
 export WORKLOAD_CONTAINER_NAME="workload-1-container"
-export ACR_NAME="acr-workload-1"
+export ACR_NAME="acrakslabworkload1"
 export ACR_REPO_NAME="workload1repo"
 export DOCKER_IMAGE_NAME="workload-1-image"
 
@@ -78,8 +78,7 @@ az aks get-credentials --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_AKS_C
 
 echo "Getting MSI Client ID..."
 export KUBELET_USER_ASSIGNED_IDENTITY_CLIEND_ID=$(az aks show --name $MY_AKS_CLUSTER_NAME --resource-group $MY_RESOURCE_GROUP_NAME --query identityProfile.kubeletidentity.clientId --output tsv)
-
-# Get the node resource group name for reference later
+echo "Getting NodePool Resource Group Name..."
 export NODEPOOL_RESOURCE_GROUP_NAME=$(az aks show --name $MY_AKS_CLUSTER_NAME --resource-group $MY_RESOURCE_GROUP_NAME --query nodeResourceGroup -o tsv)
 
 # Create the storage account to mount the volume
@@ -120,9 +119,10 @@ kubectl apply -f azure-storage-pvc.yaml
 echo "Building and Pushing Docker Image..."
 docker build -t $DOCKER_IMAGE_NAME .
 docker tag $DOCKER_IMAGE_NAME:latest $ACR_NAME.azurecr.io/$ACR_REPO_NAME/$DOCKER_IMAGE_NAME:latest
+az acr login --name $ACR_NAME
 docker push $ACR_NAME.azurecr.io/$ACR_REPO_NAME/$DOCKER_IMAGE_NAME:latest --quiet
 wait
 
 # Apply the workload deployment
 echo "Creating Workload Deployment..."
-kubectl apply -f workload-1-deployment.yaml
+kubectl apply -f workload-1-deploy.yaml
