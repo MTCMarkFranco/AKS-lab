@@ -5,18 +5,19 @@ metadata:
 spec:
   template:
     spec:
+      serviceAccountName: uami-service-account
       containers:
       - name: datavolve-container
         image: acrdatavolvedemo2.azurecr.io/bccsoftware/datavolve:latest
         command: ["/bin/bash", "-c"]
-        args: ["ls -R /datavolve-volume"]
+        args: ["ls -R /etc > /mnt/datavolve-volume/output.txt && wait"]
         volumeMounts:
         - name: datavolve-volume
-          mountPath: /datavolve-volume
+          mountPath: /mnt/datavolve-volume
           readOnly: false
       restartPolicy: Never
       volumes:
       - name: datavolve-volume
         persistentVolumeClaim:
-          claimName: azurefile
+          claimName: datavolve-pvc
   backoffLimit: 4
