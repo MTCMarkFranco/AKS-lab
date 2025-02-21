@@ -2,7 +2,7 @@
 export MY_RESOURCE_GROUP_NAME="AKS-Lab-ResourceGroup"
 export REGION="canadacentral"
 export MY_AKS_CLUSTER_NAME="AKSLabCluster"
-export NODEPOOL_NAME="workload-1-nodepool"
+export NODEPOOL_NAME="workload-npl"
 export WORKLOAD_STORAGE_ACCOUNT_NAME="saworkload1account"
 export WORKLOAD_CONTAINER_NAME="workload-1-container"
 export ACR_NAME="acr-workload-1"
