@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: datavolve-volume
+  name: workload-1-volume
   labels:
-    usage: datavolve
+    usage: workload-1
 spec:
   capacity:
     storage: 5Gi
@@ -12,13 +12,11 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   csi:
     driver: blob.csi.azure.com
-    volumeHandle: MC_myAKSResourceGroup0472af_myAKSCluster0472af_canadacentral#sadatavolveaccount#datavolve-container
+    volumeHandle: MC_myAKSResourceGroup0472af_myAKSCluster0472af_canadacentral#saworkload1account#workload-1-container
     volumeAttributes:
-      containerName: datavolve-container
-      storageAccount: sadatavolveaccount
+      containerName: workload-1-container
+      storageAccount: saworkload1account
       azureStorageAuthType: MSI
-      azureStorageIdentityClientID: 261ac719-91e0-438d-aebc-7e5687c074fb
-
-# bebdf0a7-be7a-48ab-90e8-dfcb0fad3c0b
+      azureStorageIdentityClientID: ${AZURE_STORAGE_IDENTITY_CLIENT_ID}
 
 
