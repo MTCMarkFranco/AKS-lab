@@ -1,6 +1,6 @@
 # AKS Job Container Deployment
 
-This project deploys an Azure Kubernetes Service (AKS) Job Container that mounts a container in an Azure Storage Account. The container writes files to the mounted storage and completes the job upon finishing the file operations. The storage account container is mounted using the Cluster User Assigned Managed Identity (UAMI) assigned to the default Nodepool, which has been granted the "Storage Blob Data Contributor" role using RBAC IAM.
+This project deploys an Azure Kubernetes Service (AKS) Job Container that mounts a container in an Azure Storage Account. The container writes files to the mounted storage and completes the job upon finishing the file operations. The storage account container is mounted using the **Cluster User Assigned Managed Identity (UAMI) assigned to the default Nodepool**, which has been granted the "Storage Blob Data Contributor" role using RBAC IAM.
 
 ## Prerequisites
 
