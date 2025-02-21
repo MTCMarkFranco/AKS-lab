@@ -1,5 +1,4 @@
 # Initialization
-export AZURE_SUBSCRIPTION="Contoso"
 export MY_RESOURCE_GROUP_NAME="AKS-Lab-ResourceGroup"
 export REGION="canadacentral"
 export MY_AKS_CLUSTER_NAME="AKSLabCluster"
@@ -46,7 +45,6 @@ echo "----------------------------------------"
 
 # Az Login
 az login --use-device-code
-az account set --subscription $AZURE_SUBSCRIPTION
 
 # Creation Commands
 echo "Creating AKS Cluster: $MY_AKS_CLUSTER_NAME"
