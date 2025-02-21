@@ -1,33 +1,24 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  annotations:
-    pv.kubernetes.io/provisioned-by: blob.csi.azure.com
   name: datavolve-volume
+  labels:
+    usage: datavolve
 spec:
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: default  # Use the default StorageClass
   csi:
     driver: blob.csi.azure.com
-    volumeHandle: "MC_myAKSResourceGroup0472af_myAKSCluster0472af_canadacentral#sadatavolveaccount#datavolve-container"  # make sure this volumeid is unique for every identical share in the cluster
+    volumeHandle: MC_myAKSResourceGroup0472af_myAKSCluster0472af_canadacentral#sadatavolveaccount#datavolve-container
     volumeAttributes:
-      containerName: datavolve-container  # updated to point to a container
-      protocol: blobfuse
-      useManagedIdentity: "true"
-      managedIdentityClientID: "261ac719-91e0-438d-aebc-7e5687c074fb"
-  mountOptions:
-    - --file-cache-timeout-in-seconds=120
-    - --use-https=true
-    - --use-attr-cache=true
-    - --log-level=LOG_WARNING
-    - --cache-size-mb=100
-    - --tmp-path=/mnt/blobfusetmp
-    - --logging=type:syslog,level:log_warning,file-path=/var/log/blobfuse.log
-    - --components=libfuse,block_cache,file_cache,attr_cache,azstorage
-    - --block-cache=block-size-mb:16,mem-size-mb:1024,path=/mnt/blobfuseblockcache,disk-size-mb:2048,disk-timeout-sec:120,prefetch:4,parallelism:8
-    - --file-cache=path=/mnt/blobfusefilecache,timeout-sec:120,max-size-mb:2048
-    - --azstorage=type:block,account-name:sadatavolveaccount,container:datavolve-container,mode:msi,appid:261ac719-91e0-438d-aebc-7e5687c074fb
+      containerName: datavolve-container
+      storageAccount: sadatavolveaccount
+      azureStorageAuthType: MSI
+      azureStorageIdentityClientID: 261ac719-91e0-438d-aebc-7e5687c074fb
+
+# bebdf0a7-be7a-48ab-90e8-dfcb0fad3c0b
+
+

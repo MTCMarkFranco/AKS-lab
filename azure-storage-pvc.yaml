@@ -1,13 +1,15 @@
-# filepath: /f:/Projects/AKS-lab/azure-storage-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: datavolve-volume-claim
+  name: datavolve-pvc
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: azureblob-fuse-premium  # Use the default StorageClass
-  volumeName: datavolve-volume
   resources:
     requests:
       storage: 5Gi
+  volumeName: datavolve-volume
+  storageClassName: ""
+  selector:
+    matchLabels:
+      usage: datavolve
